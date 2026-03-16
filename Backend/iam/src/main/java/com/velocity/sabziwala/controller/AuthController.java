@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import com.velocity.sabziwala.dto.request.RefreshTokenRequest;
 import com.velocity.sabziwala.dto.request.RegisterRequest;
 import com.velocity.sabziwala.dto.response.ApiResponse;
 import com.velocity.sabziwala.dto.response.AuthResponse;
+import com.velocity.sabziwala.dto.response.UserResponse;
 import com.velocity.sabziwala.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,8 +45,7 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
 		AuthResponse response = authService.login(request);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(ApiResponse.sucess("Login Successful!", response));
+		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.sucess("Login Successful!", response));
 	}
 
 	@PostMapping("/refresh")
@@ -62,8 +63,15 @@ public class AuthController {
 		String accessToken = authHeader.substring(7);
 		authService.logout(accessToken, userDetails.getUsername());
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(ApiResponse.sucess("Logged Out successfully !"));
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.sucess("Logged Out successfully !"));
+	}
+
+	@GetMapping("/me")
+	public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+
+		UserResponse user = authService.getCurrentUser(userDetails.getUsername());
+
+		return ResponseEntity.ok(ApiResponse.sucess("User profile retrieved", user));
 	}
 
 }
