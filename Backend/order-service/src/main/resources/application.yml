@@ -1,0 +1,55 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /orders/api
+
+spring:
+  application:
+    name: order-service
+
+  # ── PostgreSQL
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sabziwala}
+    username: ${DB_USER:admin}
+    password: ${DB_PASS:admin}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: Order-HikariPool
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+  # ── JPA / Hibernate ──
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: orders
+    open-in-view: false
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# JWT — MUST match the IAM Service's secret exactly
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+jwt:
+  secret: ${JWT_SECRET:c2FienVpd2FsYS1oeXBlcmxvY2FsLXZlZ2V0YWJsZS1mcnVpdC1kZWxpdmVyeS1wdW5lLWluZGlhLXNlY3JldC1rZXktMjAyNA==}
+
+# ── Inter-service URLs ──
+services:
+  iam-url: ${IAM_SERVICE_URL:http://localhost:8081/api/v1}
+  cart-url: ${CART_SERVICE_URL:http://localhost:8084/api/v1}
+  inventory-url: ${INVENTORY_SERVICE_URL:http://localhost:8086/api/v1}
+  payment-url: ${PAYMENT_SERVICE_URL:http://localhost:8085/api/v1}
+
+# ── CORS ──
+cors:
+  allowed-origins: ${CORS_ORIGINS:http://localhost:4200,http://localhost:3000}
+
+# ── Logging ──
+logging:
+  level:
+    root: INFO
+    com.sabziwala.order: DEBUG
+    org.springframework.security: DEBUG
